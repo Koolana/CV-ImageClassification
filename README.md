@@ -3,7 +3,7 @@
 ## Code requirements
 numpy: pip3 install numpy
 
-opencv: pip3 insall opencv-python
+opencv: pip3 install opencv-python
 
 torch: pip3 install torch
 
