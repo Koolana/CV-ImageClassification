@@ -2,8 +2,11 @@
 
 ## Code requirements
 numpy: pip3 install numpy
+
 opencv: pip3 insall opencv-python
+
 torch: pip3 install torch
+
 glob: pip3 install glob
 
 ## File "main.py"
