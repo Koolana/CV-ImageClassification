@@ -34,10 +34,12 @@ class CustomDataset(Dataset):
 		# print(*self.data, sep='\n')
 		self.class_map = {'Bread' : 0, 'Dessert' : 1, 'Meat' : 2, 'Soup' : 3}
 		self.img_dim = (32, 32) # (32, 32)
-
+	
+	# функция, которая возвращает длину набора данных
 	def __len__(self):
 		return len(self.data)
-
+	
+	# функция, которая возвращает один обучающий пример
 	def __getitem__(self, idx):
 		img_path, class_name = self.data[idx]
 
