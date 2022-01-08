@@ -35,7 +35,7 @@ class CustomDataset(Dataset):
 
 		# print(*self.data, sep='\n')
 		self.class_map = {'Bread' : 0, 'Dessert' : 1, 'Meat' : 2, 'Soup' : 3}
-		self.img_dim = (32, 32) # (32, 32)
+		self.img_dim = (256, 256) # (32, 32)
 
 	# функция, которая возвращает длину набора данных
 	def __len__(self):
@@ -101,7 +101,7 @@ if __name__ == "__main__":
 	plt.title('Labels: ' + ', '.join([dataset.getName(i) for i in train_labels]))
 	gridImgs = torchvision.utils.make_grid(train_features)
 	plt.imshow(cv2.cvtColor(gridImgs.permute(1, 2, 0).numpy() / 255, cv2.COLOR_BGR2RGB))
-	plt.show()
+	# plt.show()
 
 	device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 	print(device)
@@ -110,8 +110,8 @@ if __name__ == "__main__":
 	print(model)
 
 	criterion = nn.CrossEntropyLoss()
-	# optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
-	optimizer = optim.Adam(model.parameters(), lr=0.001)
+	optimizer = optim.SGD(model.parameters(), lr=0.0001, momentum=0.9)
+	# optimizer = optim.Adam(model.parameters(), lr=0.001)
 
 	best_loss = np.inf
 	best_accuracy = 0.0
