@@ -17,6 +17,8 @@ import matplotlib.pyplot as plt
 
 from model import ClassificationModel
 
+from utils import calcAccuracy
+
 matplotlib.use('TkAgg')
 
 class CustomDataset(Dataset):
@@ -34,11 +36,11 @@ class CustomDataset(Dataset):
 		# print(*self.data, sep='\n')
 		self.class_map = {'Bread' : 0, 'Dessert' : 1, 'Meat' : 2, 'Soup' : 3}
 		self.img_dim = (32, 32) # (32, 32)
-	
+
 	# функция, которая возвращает длину набора данных
 	def __len__(self):
 		return len(self.data)
-	
+
 	# функция, которая возвращает один обучающий пример
 	def __getitem__(self, idx):
 		img_path, class_name = self.data[idx]
@@ -112,8 +114,9 @@ if __name__ == "__main__":
 	optimizer = optim.Adam(model.parameters(), lr=0.001)
 
 	best_loss = np.inf
+	best_accuracy = 0.0
 
-	for epoch in range(5):
+	for epoch in range(10):
 		model.train()
 		epoch_loss = 0.0
 
@@ -141,8 +144,12 @@ if __name__ == "__main__":
 
 		model.eval()
 		epoch_loss = 0.0
+		accuracy = 0.0
 
 		with torch.no_grad():
+			predictList = []
+			targetList = []
+
 			for i, data in enumerate(data_loader_test, 0):
 				# получаем вводные данные
 				inputs, labels = data
@@ -151,20 +158,30 @@ if __name__ == "__main__":
 
 				outputs = model(inputs)
 
+				predictList += torch.max(outputs, 1)[1].tolist()
+				targetList += labels.squeeze(1).tolist()
+
+				accuracyDict = calcAccuracy(targetList, predictList)
+
 				loss = criterion(outputs, torch.max(labels, 1)[0])
 
 				epoch_loss += loss.item()
 
 		print('[%d] Test loss: %.10f %.10f' % (epoch + 1, epoch_loss, epoch_loss / len(data_loader_test)))
+		print('[%d] Test accuracy:' % (epoch + 1))
 
-		if epoch_loss < best_loss:
-			print('New best loss:', epoch_loss)
-			best_loss = epoch_loss
+		print(*[f'\t{dataset.getName(i)}: {accuracyDict[i]:.2f}' for i in accuracyDict.keys()], sep='\n')
+
+		accuracy = sum([accuracyDict[i] for i in accuracyDict.keys()]) / len(accuracyDict.keys())
+
+		if best_accuracy < accuracy:
+			print('New best model with average accuracy:', accuracy)
+			best_accuracy = accuracy
 			best_model = pickle.loads(pickle.dumps(model))
 
 		print(10 * '-')
 
-	print('Тренировка завершена, наименьшая ошибка:', best_loss)
+	print('Тренировка завершена, наилучшая средняя точность:', best_accuracy)
 
 	print('Проверка наилучшей модели')
 
