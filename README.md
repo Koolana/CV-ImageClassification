@@ -38,7 +38,7 @@ weight = weight - learning_rate * gradient.
 
 ## Experiments
 ### File "main.py"
-Создание пользовательского набора данных и загрузчика данных в Pytorch подробно описано в [the documentation](https://pytorch.org/tutorials/beginner/basics/data_tutorial.html).
+Создание пользовательского набора данных и загрузчика данных в Pytorch подробно описано в [документации](https://pytorch.org/tutorials/beginner/basics/data_tutorial.html).
 
 Мы определяем функцию init для инициализации наших переменных. Переменная self.imgs_path содержит базовый путь к нашей папке "dataset".
 
