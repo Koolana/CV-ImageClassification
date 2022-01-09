@@ -64,7 +64,7 @@ if __name__ == "__main__":
 		model.train()
 		epoch_loss = 0.0
 
-		for i, data in enumerate(tqdm(data_loader_train, desc='Training batches'), 0):
+		for i, data in enumerate(tqdm(data_loader_train, desc='[%d] Training batches' % (epoch + 1)), 0):
 			# получаем вводные данные
 			inputs, labels = data
 			labels = labels.to(device)
@@ -94,7 +94,7 @@ if __name__ == "__main__":
 			predictList = []
 			targetList = []
 
-			for i, data in enumerate(tqdm(data_loader_test, desc='Testing batches'), 0):
+			for i, data in enumerate(tqdm(data_loader_test, desc='[%d] Testing batches' % (epoch + 1)), 0):
 				# получаем вводные данные
 				inputs, labels = data
 				labels = labels.to(device)
