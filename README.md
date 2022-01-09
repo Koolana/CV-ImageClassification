@@ -10,15 +10,16 @@ torch: pip3 install torch
 glob: pip3 install glob
 
 ## File "main.py"
-Creating a custom dataset and data loader in Pytorch is described in detail in [the documentation](https://pytorch.org/tutorials/beginner/basics/data_tutorial.html).
+Создание пользовательского набора данных и загрузчика данных в Pytorch подробно описано в [the documentation](https://pytorch.org/tutorials/beginner/basics/data_tutorial.html).
 
-We define the init function to initialize our variables. The variable self.imgs_path contains the base path to our "dataset" folder.
+Мы определяем функцию init для инициализации наших переменных. Переменная self.imgs_path содержит базовый путь к нашей папке "dataset".
 
-We have created a list with all our data, we start coding the function for __len__(), which is mandatory for a Torch Dataset object.
+Мы создали список со всеми нашими данными, мы начинаем кодировать функцию для __len__(), которая является обязательным для объекта Torch Dataset.
 
-The size of our dataset is just the number of individual images we have, which can be obtained through the length of the self.data list. (Torch internally uses this function to understand the size of the dataset in its dataloader, to call the __getitem__() function with an index within this dataset size).
+Размер нашего набора данных - это просто количество отдельных изображений, которые у нас есть, которое можно получить через длину списка self.data. (Torch внутренне использует эту функцию для понимания размера набора данных в своем dataloader, чтобы вызвать функцию __getitem__() с индексом в пределах этого размера набора данных).
 
 ## Dataset
-The folder structure is as follows. We have the Project folder that contains the code main.py and code model.py, and a folder called "dataset". This folder called "dataset" is the dataset folder that contains 4 subfolders inside it called Soup, Dessert, Meat and Bread.
+Структура папок выглядит следующим образом. У нас есть папка Project, которая содержит код main.py и код model.py, и папка под названием "dataset". Эта папка под названием "dataset" - это папка dataset, которая содержит 4 вложенные папки под названиями Soup, Dessert, Meat и Bread.
 
-[Link to dataset here](https://drive.google.com/drive/folders/1fkSZmSQo_W6Jz3Jb5R0bWwQKKH1Pn2x0?usp=sharing) (Здесь представлена ссылка на датасет).
+
+[Ссылка на набор данных здесь](https://drive.google.com/drive/folders/1fkSZmSQo_W6Jz3Jb5R0bWwQKKH1Pn2x0?usp=sharing)
