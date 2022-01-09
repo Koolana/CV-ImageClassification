@@ -1,13 +1,25 @@
 # CV-ImageClassification
 
 ## Code requirements
-numpy: pip3 install numpy
+* numpy: pip3 install numpy
+* opencv: pip3 install opencv-python
+* torch: pip3 install torch
+* glob: pip3 install glob
 
-opencv: pip3 install opencv-python
+## Model description
+Обучение модели глубокого обучения требует от нас преобразования данных в формат, который может быть обработан моделью.
 
-torch: pip3 install torch
+Типичная процедура обучения для нейронной сети следующая:
 
-glob: pip3 install glob
+1. Определение нейронной сети, которая имеет некоторые изучаемые параметры (или веса);
+2. Итерация по набору входных данных;
+3. Обработка ввода через сеть;
+4. Рассчет потери (насколько далеки результаты от правильных);
+5. Распространение градиентов обратно на параметры сети;
+6. Обновление весов сети, как правило, используя простое правило обновления:
+weight = weight - learning_rate * gradient.
+
+Использована нейронная сеть для приема 3-канального изображения.
 
 ## File "main.py"
 Создание пользовательского набора данных и загрузчика данных в Pytorch подробно описано в [the documentation](https://pytorch.org/tutorials/beginner/basics/data_tutorial.html).
