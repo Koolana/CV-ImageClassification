@@ -1,15 +1,17 @@
-import glob
 import cv2
 import numpy as np
+from tqdm import tqdm
 
 import pickle
 
 import torch
-import torchvision
 import torch.nn as nn
 import torch.optim as optim
 
-from torch.utils.data import Dataset, DataLoader
+import torchvision
+import torchsummary
+
+from torch.utils.data import DataLoader
 from sklearn.model_selection import train_test_split
 
 import matplotlib
@@ -17,79 +19,20 @@ import matplotlib.pyplot as plt
 
 from model import ClassificationModel
 
+from dataset import CustomDataset
 from utils import calcAccuracy
 
 matplotlib.use('TkAgg')
-
-class CustomDataset(Dataset):
-	def __init__(self):
-		self.imgs_path = 'dataset'
-		file_list = glob.glob(self.imgs_path + '/*')
-		# print(file_list)
-
-		self.data = []
-		for class_path in file_list:
-			class_name = class_path.split('/')[-1]
-			for img_path in glob.glob(class_path + '/' +'*.jpg'):
-				self.data.append([img_path, class_name])
-
-		# print(*self.data, sep='\n')
-		self.class_map = {'Bread' : 0, 'Dessert' : 1, 'Meat' : 2, 'Soup' : 3}
-		self.img_dim = (256, 256) # (32, 32)
-
-	# функция, которая возвращает длину набора данных
-	def __len__(self):
-		return len(self.data)
-
-	# функция, которая возвращает один обучающий пример
-	def __getitem__(self, idx):
-		img_path, class_name = self.data[idx]
-
-		# сопоставление имени с числом
-		class_id = self.class_map[class_name]
-
-	    # преобразуем целочисленное значение class_id в тензор
-	    # также увеличиваем его размерность, ссылаясь на него как [class_id].
-	    # Это необходимо для того, чтобы обеспечить возможность пакетной
-	    # обработки данных в тех размерах, которые требуются torch.
-		class_id = torch.tensor([class_id])
-
-		return img_path, class_id
-
-	def getImgsTensors(self, imgs_path):
-		output_tensor = torch.tensor([], dtype=torch.float)
-
-		for img_path in imgs_path:
-			img = cv2.imread(img_path)
-			# print(img.shape)
-			img = cv2.resize(img, self.img_dim)
-
-		    # преобразуем переменные в тензоры (torch.from_numpy позволяет
-		    # преобразовать массив numpy в тензор)
-			img_tensor = torch.from_numpy(img)
-			# замены осей ((Каналы, Ширина, Высота))
-			img_tensor = img_tensor.permute(2, 0, 1).float()
-
-			img_tensor = img_tensor.unsqueeze(0)
-
-			output_tensor = torch.cat((output_tensor, img_tensor))
-
-		return output_tensor
-
-	def getName(self, value):
-	    for k, v in self.class_map.items():
-	        if v == value:
-	            return k
 
 if __name__ == "__main__":
 	# Чтобы протестировать набор данных и наш загрузчик данных, в главной
 	# функции нашего скрипта мы создаем экземпляр созданного
 	# CustomDataset и назовем его dataset.
 	dataset = CustomDataset()
-	dataset_train, dataset_test = train_test_split(dataset, test_size=0.7)
+	dataset_train, dataset_test = train_test_split(dataset, test_size=0.3)
 
-	data_loader_train = DataLoader(dataset_train, batch_size=8, shuffle=True)
-	data_loader_test = DataLoader(dataset_test, batch_size=8, shuffle=True)
+	data_loader_train = DataLoader(dataset_train, batch_size=16, shuffle=True)
+	data_loader_test = DataLoader(dataset_test, batch_size=16, shuffle=True)
 
 	# Display image and label.
 	train_features, train_labels = next(iter(data_loader_train))
@@ -108,19 +51,20 @@ if __name__ == "__main__":
 
 	model = ClassificationModel().to(device)
 	print(model)
+	torchsummary.summary(model, (3, 256, 256))
 
 	criterion = nn.CrossEntropyLoss()
-	optimizer = optim.SGD(model.parameters(), lr=0.0001, momentum=0.9)
+	optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 	# optimizer = optim.Adam(model.parameters(), lr=0.001)
 
 	best_loss = np.inf
 	best_accuracy = 0.0
 
-	for epoch in range(10):
+	for epoch in range(30):
 		model.train()
 		epoch_loss = 0.0
 
-		for i, data in enumerate(data_loader_train, 0):
+		for i, data in enumerate(tqdm(data_loader_train, desc='Training batches'), 0):
 			# получаем вводные данные
 			inputs, labels = data
 			labels = labels.to(device)
@@ -150,7 +94,7 @@ if __name__ == "__main__":
 			predictList = []
 			targetList = []
 
-			for i, data in enumerate(data_loader_test, 0):
+			for i, data in enumerate(tqdm(data_loader_test, desc='Testing batches'), 0):
 				# получаем вводные данные
 				inputs, labels = data
 				labels = labels.to(device)
