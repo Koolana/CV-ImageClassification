@@ -1,4 +1,4 @@
-import glob
+import glob # Модуль glob находит все имена путей, соответствующие заданному шаблону
 import torch
 import cv2
 
@@ -6,7 +6,7 @@ from torch.utils.data import Dataset
 
 class CustomDataset(Dataset):
 	def __init__(self):
-		self.imgs_path = 'dataset'
+		self.imgs_path = 'dataset' # корневая папка, где находится датасет
 		file_list = glob.glob(self.imgs_path + '/*')
 		# print(file_list)
 
@@ -17,6 +17,7 @@ class CustomDataset(Dataset):
 				self.data.append([img_path, class_name])
 
 		# print(*self.data, sep='\n')
+		# записываем существующие классы
 		self.class_map = {'Bread' : 0, 'Dessert' : 1, 'Meat' : 2, 'Soup' : 3}
 		self.img_dim = (256, 256) # (32, 32)
 
@@ -31,8 +32,8 @@ class CustomDataset(Dataset):
 		# сопоставление имени с числом
 		class_id = self.class_map[class_name]
 
-	    # преобразуем целочисленное значение class_id в тензор
-	    # также увеличиваем его размерность, ссылаясь на него как [class_id].
+	    # преобразуем целочисленное значение class_id в тензор 
+	    # также увеличиваем его размерность, ссылаясь на него как [class_id]. 
 	    # Это необходимо для того, чтобы обеспечить возможность пакетной
 	    # обработки данных в тех размерах, которые требуются torch.
 		class_id = torch.tensor([class_id])
