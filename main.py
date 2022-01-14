@@ -19,6 +19,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 
 from model import ClassificationModel
+# Класс ClassificationModel используется для всех задач классификации текста, кроме классификации по нескольким меткам.
 
 from dataset import CustomDataset
 from utils import calcAccuracy
@@ -121,13 +122,13 @@ if __name__ == "__main__":
 		accuracy = sum([accuracyDict[i] for i in accuracyDict.keys()]) / len(accuracyDict.keys())
 
 		if best_accuracy < accuracy:
-			print('New best model with average accuracy:', accuracy)
+			print('New best model with average accuracy: ', accuracy)
 			best_accuracy = accuracy
 			best_model = pickle.loads(pickle.dumps(model))
 
 		print(10 * '-')
 
-	print('Тренировка завершена, наилучшая средняя точность:', best_accuracy)
+	print('Тренировка завершена, наилучшая средняя точность: ', best_accuracy)
 
 	print('Проверка наилучшей модели')
 
