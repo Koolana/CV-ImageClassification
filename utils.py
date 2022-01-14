@@ -1,3 +1,4 @@
+# считаем точность по среднему значению
 def calcAccuracy(target, predict):
     dict = {i : [] for i in set(target)}
 
