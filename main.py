@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 from tqdm import tqdm
 
+# Модуль pickle реализует двоичные протоколы для сериализации и де-сериализации объектной структуры Python.
 import pickle
 
 import torch
@@ -26,15 +27,15 @@ matplotlib.use('TkAgg')
 
 if __name__ == "__main__":
 	# Чтобы протестировать набор данных и наш загрузчик данных, в главной
-	# функции нашего скрипта мы создаем экземпляр созданного
-	# CustomDataset и назовем его dataset.
+	# функции нашего скрипта, мы создаем экземпляр созданного
+	# CustomDataset и называем его dataset.
 	dataset = CustomDataset()
-	dataset_train, dataset_test = train_test_split(dataset, test_size=0.3)
+	dataset_train, dataset_test = train_test_split(dataset, test_size=0.3) # 30% используем для тестирования
 
 	data_loader_train = DataLoader(dataset_train, batch_size=16, shuffle=True)
 	data_loader_test = DataLoader(dataset_test, batch_size=16, shuffle=True)
 
-	# Display image and label.
+	# Вывод на экран изображение и label (метку)
 	train_features, train_labels = next(iter(data_loader_train))
 	train_features = dataset.getImgsTensors(train_features)
 
@@ -43,6 +44,7 @@ if __name__ == "__main__":
 
 	plt.title('Labels: ' + ', '.join([dataset.getName(i) for i in train_labels]))
 	gridImgs = torchvision.utils.make_grid(train_features)
+	# оставляем изображение в исходной цветовой гамме (три канала - цветное изображение)
 	plt.imshow(cv2.cvtColor(gridImgs.permute(1, 2, 0).numpy() / 255, cv2.COLOR_BGR2RGB))
 	# plt.show()
 
@@ -53,8 +55,8 @@ if __name__ == "__main__":
 	print(model)
 	torchsummary.summary(model, (3, 256, 256))
 
-	criterion = nn.CrossEntropyLoss()
-	optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
+	criterion = nn.CrossEntropyLoss() # делает для нас softmax
+	optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9) # Реализует стохастический градиентный спуск
 	# optimizer = optim.Adam(model.parameters(), lr=0.001)
 
 	best_loss = np.inf
@@ -65,15 +67,15 @@ if __name__ == "__main__":
 		epoch_loss = 0.0
 
 		for i, data in enumerate(tqdm(data_loader_train, desc='[%d] Training batches' % (epoch + 1)), 0):
-			# получаем вводные данные
+			# получаем вводные данные:
 			inputs, labels = data
 			labels = labels.to(device)
 			inputs = dataset.getImgsTensors(inputs).to(device)
 
-			# обнуляем параметр gradients
+			# обнуляем параметр gradients:
 			optimizer.zero_grad()
 
-			# forward + backward + optimize
+			# forward + backward + optimize:
 			outputs = model(inputs)
 			# exit()
 
@@ -95,7 +97,7 @@ if __name__ == "__main__":
 			targetList = []
 
 			for i, data in enumerate(tqdm(data_loader_test, desc='[%d] Testing batches' % (epoch + 1)), 0):
-				# получаем вводные данные
+				# получаем вводные данные:
 				inputs, labels = data
 				labels = labels.to(device)
 				inputs = dataset.getImgsTensors(inputs).to(device)
@@ -129,7 +131,7 @@ if __name__ == "__main__":
 
 	print('Проверка наилучшей модели')
 
-	# Display image and label.
+	# Вывод на экран изображение и label (метку).
 	test_features, test_labels = next(iter(data_loader_test))
 	test_labels = test_labels.to(device)
 	test_features = dataset.getImgsTensors(test_features).to(device)
