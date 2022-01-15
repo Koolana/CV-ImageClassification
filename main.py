@@ -56,6 +56,7 @@ if __name__ == "__main__":
 	print(model)
 	torchsummary.summary(model, (3, 256, 256))
 
+	# использовать классификационный Cross-Entropy loss и SGD с импульсом = 0.9.
 	criterion = nn.CrossEntropyLoss() # делает для нас softmax
 	optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9) # Реализует стохастический градиентный спуск
 	# optimizer = optim.Adam(model.parameters(), lr=0.001)
@@ -68,7 +69,7 @@ if __name__ == "__main__":
 		epoch_loss = 0.0
 
 		for i, data in enumerate(tqdm(data_loader_train, desc='[%d] Training batches' % (epoch + 1)), 0):
-			# получаем вводные данные:
+			# получаем входные данные; данные - это список [inputs, labels].
 			inputs, labels = data
 			labels = labels.to(device)
 			inputs = dataset.getImgsTensors(inputs).to(device)
@@ -84,7 +85,7 @@ if __name__ == "__main__":
 			loss.backward()
 
 			optimizer.step()
-
+			# вывести статистику
 			epoch_loss += loss.item()
 
 		print('[%d] Train loss: %.10f %.10f' % (epoch + 1, epoch_loss, epoch_loss / len(data_loader_train)))
