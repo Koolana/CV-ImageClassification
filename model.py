@@ -18,7 +18,7 @@ class ClassificationModel(nn.Module):
         self.conv5 = nn.Conv2d(256, 128, 3, 1, 1)
         self.pool3 = nn.MaxPool2d(3, 2)
 
-        self.fc1 = nn.Linear(128 * 14 * 14, 512)  # 256px, 61 - зависимость от изображения и MaxPool2d (при 32px - 5)
+        self.fc1 = nn.Linear(128 * 6 * 6, 512)  # 256px, 61 - зависимость от изображения и MaxPool2d (при 32px - 5)
         self.fc2 = nn.Linear(512, 512)
         self.fc3 = nn.Linear(512, 4)
 
@@ -45,7 +45,7 @@ class ClassificationModel(nn.Module):
         x = self.pool3(x)
         # print(x.size())
 
-        x = x.view(-1, 128 * 14 * 14)  # 256px, 61 - зависимость от изображения MaxPool2d (при 32px - 5)
+        x = x.view(-1, 128 * 6 * 6)  # 256px, 61 - зависимость от изображения MaxPool2d (при 32px - 5)
         # print(x.size())
 
         x = self.fc1(x)

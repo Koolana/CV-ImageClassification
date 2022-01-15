@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from tqdm import tqdm
+import tqdm as tq
 
 # Модуль pickle реализует двоичные протоколы для сериализации и де-сериализации объектной структуры Python.
 import pickle
@@ -22,7 +22,7 @@ from model import ClassificationModel
 # Класс ClassificationModel используется для всех задач классификации текста, кроме классификации по нескольким меткам.
 
 from dataset import CustomDataset
-from utils import calcAccuracy
+from trainer import Trainer
 
 matplotlib.use('TkAgg')
 
@@ -31,10 +31,12 @@ if __name__ == "__main__":
 	# функции нашего скрипта, мы создаем экземпляр созданного
 	# CustomDataset и называем его dataset.
 	dataset = CustomDataset()
-	dataset_train, dataset_test = train_test_split(dataset, test_size=0.3) # 30% используем для тестирования
+	dataset_train, dataset_test = train_test_split(dataset, test_size=0.2)
+	dataset_train, dataset_val = train_test_split(dataset_train, test_size=0.2)
 
 	data_loader_train = DataLoader(dataset_train, batch_size=16, shuffle=True)
 	data_loader_test = DataLoader(dataset_test, batch_size=16, shuffle=True)
+	data_loader_val = DataLoader(dataset_val, batch_size=16, shuffle=True)
 
 	# Вывод на экран изображение и label (метку)
 	train_features, train_labels = next(iter(data_loader_train))
@@ -54,66 +56,22 @@ if __name__ == "__main__":
 
 	model = ClassificationModel().to(device)
 	print(model)
-	torchsummary.summary(model, (3, 256, 256))
+	torchsummary.summary(model, (3, 128, 128))
 
-	# использовать классификационный Cross-Entropy loss и SGD с импульсом = 0.9.
-	criterion = nn.CrossEntropyLoss() # делает для нас softmax
-	optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9) # Реализует стохастический градиентный спуск
 	# optimizer = optim.Adam(model.parameters(), lr=0.001)
+
+	trainer = Trainer(model, data_loader_train, data_loader_test, data_loader_val,
+					  device, getTensorsFunc=dataset.getImgsTensors, tqdm=tq.tqdm)
 
 	best_loss = np.inf
 	best_accuracy = 0.0
 
 	for epoch in range(30):
-		model.train()
-		epoch_loss = 0.0
-
-		for i, data in enumerate(tqdm(data_loader_train, desc='[%d] Training batches' % (epoch + 1)), 0):
-			# получаем входные данные; данные - это список [inputs, labels].
-			inputs, labels = data
-			labels = labels.to(device)
-			inputs = dataset.getImgsTensors(inputs).to(device)
-
-			# обнуляем параметр gradients:
-			optimizer.zero_grad()
-
-			# forward + backward + optimize:
-			outputs = model(inputs)
-			# exit()
-
-			loss = criterion(outputs, torch.max(labels, 1)[0])
-			loss.backward()
-
-			optimizer.step()
-			# вывести статистику
-			epoch_loss += loss.item()
+		epoch_loss, _ = trainer.train(epoch + 1)
 
 		print('[%d] Train loss: %.10f %.10f' % (epoch + 1, epoch_loss, epoch_loss / len(data_loader_train)))
 
-		model.eval()
-		epoch_loss = 0.0
-		accuracy = 0.0
-
-		with torch.no_grad():
-			predictList = []
-			targetList = []
-
-			for i, data in enumerate(tqdm(data_loader_test, desc='[%d] Testing batches' % (epoch + 1)), 0):
-				# получаем вводные данные:
-				inputs, labels = data
-				labels = labels.to(device)
-				inputs = dataset.getImgsTensors(inputs).to(device)
-
-				outputs = model(inputs)
-
-				predictList += torch.max(outputs, 1)[1].tolist()
-				targetList += labels.squeeze(1).tolist()
-
-				accuracyDict = calcAccuracy(targetList, predictList)
-
-				loss = criterion(outputs, torch.max(labels, 1)[0])
-
-				epoch_loss += loss.item()
+		epoch_loss, accuracyDict = trainer.test(epoch + 1)
 
 		print('[%d] Test loss: %.10f %.10f' % (epoch + 1, epoch_loss, epoch_loss / len(data_loader_test)))
 		print('[%d] Test accuracy:' % (epoch + 1))
