@@ -30,6 +30,9 @@ if __name__ == "__main__":
 	# Чтобы протестировать набор данных и наш загрузчик данных, в главной
 	# функции нашего скрипта, мы создаем экземпляр созданного
 	# CustomDataset и называем его dataset.
+	
+	# Преднамеренно разбиваем выборку на train, test, validation.
+	# Это нужно для того, чтобы проводить тестирование на том, что вообще не связано с обучением модели.
 	dataset = CustomDataset()
 	dataset_train, dataset_test = train_test_split(dataset, test_size=0.2)
 	dataset_train, dataset_val = train_test_split(dataset_train, test_size=0.2)
@@ -52,6 +55,7 @@ if __name__ == "__main__":
 	print("Used device:", device)
 
 	model = ClassificationModel().to(device)
+	# сжимаем изображение до размера 128 на 128. Так и нейронка меньше выйдет, и обучение пройдет гораздо быстрее.
 	torchsummary.summary(model, (3, 128, 128))
 
 	trainer = Trainer(model, data_loader_train, data_loader_test, data_loader_val,
