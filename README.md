@@ -104,6 +104,10 @@ Accuracy in classes:
 
 <img width="581" alt="predImgs" src="https://user-images.githubusercontent.com/37844731/149667152-a5b2152b-be8b-434c-adc0-b443689e88e1.png">
 
+Результат на случайной валидационной выборке:
+
+<img width="619" alt="after" src="https://user-images.githubusercontent.com/90565598/149660214-94d359f3-2bde-4a08-8f59-4b78a4846e4c.png">
+
 Подробный отчет по данной работе представлен в файле [блокнота Jupyter](demo.ipynb).
 
 Авторы работы: Андрейчик Николай и Шутова Ксения.
