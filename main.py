@@ -30,7 +30,7 @@ if __name__ == "__main__":
 	# Чтобы протестировать набор данных и наш загрузчик данных, в главной
 	# функции нашего скрипта, мы создаем экземпляр созданного
 	# CustomDataset и называем его dataset.
-	
+
 	# Преднамеренно разбиваем выборку на train, test, validation.
 	# Это нужно для того, чтобы проводить тестирование на том, что вообще не связано с обучением модели.
 	dataset = CustomDataset()
@@ -64,7 +64,7 @@ if __name__ == "__main__":
 	best_loss = np.inf
 	best_accuracy = 0.0
 
-	for epoch in range(1):
+	for epoch in range(15):
 		epoch_loss, _ = trainer.train(epoch + 1)
 
 		print('[%d] Train loss: %.10f %.10f' % (epoch + 1, epoch_loss, epoch_loss / len(data_loader_train)))
@@ -96,12 +96,15 @@ if __name__ == "__main__":
 
 	print('\nПроверка наилучшей модели')
 
-	accuracyDict = trainer.validation(best_model)
+	accuracyDict, confusionMatrix = trainer.validation(best_model)
 
 	test_accuracy = sum([accuracyDict[i] for i in accuracyDict.keys()]) / len(accuracyDict.keys())
 	print('Validation average accuracy: %.2f' % (test_accuracy))
 	print('Accuracy in classes:')
 	print(*[f'\t{dataset.getName(i)}: {accuracyDict[i]:.2f}' for i in accuracyDict.keys()], sep='\n')
+
+	print('Confusion matrix:')
+	print(confusionMatrix)
 
 	####################################################
 

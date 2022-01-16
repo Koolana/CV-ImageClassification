@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
+from sklearn.metrics import confusion_matrix
+
 from utils import calcAccuracy
 
 class Trainer():
@@ -100,4 +102,6 @@ class Trainer():
 
         accuracyDict = calcAccuracy(targetList, predictList)
 
-        return accuracyDict
+        confusionMatrix = confusion_matrix(targetList, predictList)
+
+        return accuracyDict, confusionMatrix
